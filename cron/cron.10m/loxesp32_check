@@ -1,0 +1,3 @@
+#!/bin/bash
+perl $LBHMT/plugins/$LBPFOLDER/index.cgi
+

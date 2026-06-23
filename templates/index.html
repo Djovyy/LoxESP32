@@ -1,0 +1,105 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>LoxESP32 - LoxBerry Plugin</title>
+<style>
+body{font-family: Arial, Helvetica, sans-serif; margin:18px; color:#222}
+table{border-collapse:collapse; width:100%; max-width:900px}
+th,td{border:1px solid #ddd; padding:8px; text-align:left}
+th{background:#f4f4f4}
+.btn{padding:6px 10px; border:none; background:#3aa; color:#fff; cursor:pointer}
+.btn-danger{background:#c33}
+.small{font-size:0.9em; color:#666}
+.msg{padding:8px; margin:8px 0; background:#eef; border:1px solid #ccd}
+</style>
+</head>
+<body>
+
+<h2>LoxESP32 - ESP32 OTA Manager</h2>
+
+<!-- message -->
+<TMPL_IF MSG>
+  <div class="msg"><TMPL_VAR MSG></div>
+</TMPL_IF>
+
+<h3>Devices</h3>
+
+<TMPL_IF DEVICES_EXIST>
+  <table>
+    <tr>
+      <th>Name</th><th>IP</th><th>Status</th><th>Last ping</th><th>Actions</th>
+    </tr>
+    <TMPL_LOOP DEVICES>
+    <tr>
+      <td><TMPL_VAR NAME></td>
+      <td><TMPL_VAR IP></td>
+      <td><TMPL_VAR STATUS></td>
+      <td><TMPL_VAR LAST_PING></td>
+      <td>
+        <form style="display:inline" method="post">
+          <input type="hidden" name="action" value="ping">
+          <input type="hidden" name="ip" value="<TMPL_VAR IP>">
+          <input class="btn" type="submit" value="Ping">
+        </form>
+
+        <form style="display:inline" method="post" enctype="multipart/form-data">
+          <input type="hidden" name="action" value="ota">
+          <input type="hidden" name="ip" value="<TMPL_VAR IP>">
+          <input type="file" name="firmware" required>
+          <input class="btn" type="submit" value="OTA">
+        </form>
+
+        <!-- BUTONUL NOU DE EDITARE -->
+        <form style="display:inline" method="get">
+          <input type="hidden" name="edit_ip" value="<TMPL_VAR IP>">
+          <input class="btn" type="submit" value="Edit">
+        </form>
+
+        <form style="display:inline" method="post">
+          <input type="hidden" name="action" value="delete">
+          <input type="hidden" name="ip" value="<TMPL_VAR IP>">
+          <input class="btn btn-danger" type="submit" value="Delete">
+        </form>
+      </td>
+    </tr>
+    </TMPL_LOOP>
+  </table>
+<TMPL_ELSE>
+  <p>No devices yet.</p>
+</TMPL_IF>
+
+<!-- FORMULARUL DINAMIC PENTRU ADAUGARE SAU EDITARE -->
+<h3><TMPL_IF IS_EDIT>Edit device<TMPL_ELSE>Add device</TMPL_IF></h3>
+<form method="post">
+  <input type="hidden" name="action" value="<TMPL_IF IS_EDIT>update_save<TMPL_ELSE>add</TMPL_IF>">
+  <input type="hidden" name="old_ip" value="<TMPL_VAR EDIT_IP>">
+  
+  Name: <input name="name" value="<TMPL_VAR EDIT_NAME>">
+  IP: <input name="ip" value="<TMPL_VAR EDIT_IP>">
+  <input class="btn" type="submit" value="<TMPL_IF IS_EDIT>Save Changes<TMPL_ELSE>Add</TMPL_IF>">
+  
+  <TMPL_IF IS_EDIT>
+    <a href="index.cgi" style="margin-left:10px; color:#666; text-decoration:none;">[Cancel]</a>
+  </TMPL_IF>
+</form>
+
+<hr>
+<p class="small">
+Notes: ESP32 must run an HTTP update endpoint at 
+<code>http://&lt;ip&gt;/update</code> which accepts POST multipart field 
+<code>update</code>. Ping checks <code>/status</code>.
+</p>
+
+<hr>
+<h3>Plugin Logs & Error History</h3>
+<div style="max-width:900px; margin-top:10px;">
+  <!-- Variabila în care LoxBerry injectează interfața sa nativă de loguri -->
+  <TMPL_VAR LOGLIST_HTML>
+</div>
+
+</body>
+</html>
+
+</body>
+</html>
